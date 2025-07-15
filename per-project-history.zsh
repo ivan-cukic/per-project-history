@@ -33,6 +33,14 @@
 [[ -z $HISTORY_START_WITH_GLOBAL ]] && HISTORY_START_WITH_GLOBAL=false
 [[ -z $PER_PROJECT_HISTORY_TOGGLE ]] && PER_PROJECT_HISTORY_TOGGLE='^G'
 
+
+if [[ -z "${PER_PROJECT_HISTORY_TAGS}" ]]; then
+  declare -a PER_PROJECT_HISTORY_TAGS
+  export PER_PROJECT_HISTORY_TAGS=(.git .envrc .per_project_history)
+  declare -r PER_PROJECT_HISTORY_TAGS
+  echo "Using the default tags ${PER_PROJECT_HISTORY_TAGS}"
+fi
+
 #-------------------------------------------------------------------------------
 # toggle global/project history used for searching - ctrl-G by default
 #-------------------------------------------------------------------------------
@@ -64,14 +72,27 @@ _per_project_history_directory="$HISTORY_BASE${PWD:A}/history"
 
 export ZSH_PROJECT_HISTORY_ACTIVE_DIRECTORY=""
 
+function _per-project-history-directory-tagged() {
+  TESTING_DIRECTORY="$1"
+  # echo "_per-project-history-directory-tagged ${TESTING_DIRECTORY}/${PER_PROJECT_HISTORY_TAGS}" >&2
+  for TAG in ${PER_PROJECT_HISTORY_TAGS}; do
+    # echo "Testing for ${TESTING_DIRECTORY}/${TAG}" >&2
+    if [[ -e "${TESTING_DIRECTORY}/${TAG}" ]]; then
+      # echo "Found ${TESTING_DIRECTORY}/${TAG}" >&2
+      return 0
+    fi
+  done
+  return 1
+}
+
 function _per-project-history-find-up() {
   CURRENT_DIR="${PWD}"
-  TAG="$1"
-  # echo "Starting with ${CURRENT_DIR}/${TAG}" >&2
-  while [ ! -e "${CURRENT_DIR}/${TAG}" ]; do
-    # echo "${CURRENT_DIR}/${TAG} does not exist" >&2
+
+  while
+    _per-project-history-directory-tagged "${CURRENT_DIR}"
+    [ $? -ne 0 ]
+  do
     CURRENT_DIR="${CURRENT_DIR:h}"
-    # echo "will check ${CURRENT_DIR}/${TAG} ..." >&2
     if [[ "/" = ${CURRENT_DIR} ]]; then
       echo "/"
       return 1
@@ -82,7 +103,8 @@ function _per-project-history-find-up() {
 }
 
 function _per-project-history-change-directory() {
-  local CURRENT_PROJECT_DIRECTORY=$(_per-project-history-find-up .git)
+  echo "Tags: ${PER_PROJECT_HISTORY_TAGS}"
+  local CURRENT_PROJECT_DIRECTORY=$(_per-project-history-find-up)
   if [[ ${CURRENT_PROJECT_DIRECTORY} = "/" ]]; then
     CURRENT_PROJECT_DIRECTORY="/no_active_project"
   fi
