@@ -36,7 +36,7 @@
 
 if [[ -z "${PER_PROJECT_HISTORY_TAGS}" ]]; then
   declare -a PER_PROJECT_HISTORY_TAGS
-  export PER_PROJECT_HISTORY_TAGS=(.git .envrc .per_project_history)
+  export PER_PROJECT_HISTORY_TAGS=(.git .hg .jj .stack-work .cabal .cargo .envrc .per_project_history)
   declare -r PER_PROJECT_HISTORY_TAGS
   echo "Using the default tags ${PER_PROJECT_HISTORY_TAGS}"
 fi
