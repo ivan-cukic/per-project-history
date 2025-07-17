@@ -1,4 +1,4 @@
-# Per-Project-History
+# Zsh-Per-Project-History
 
 Per-project history for Zsh. With the option to switch between
 the project and global histories with ^G.
