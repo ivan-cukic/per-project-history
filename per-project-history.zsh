@@ -103,7 +103,7 @@ function _per-project-history-find-up() {
 }
 
 function _per-project-history-change-directory() {
-  echo "Tags: ${PER_PROJECT_HISTORY_TAGS}"
+  # echo "Tags: ${PER_PROJECT_HISTORY_TAGS}"
   local CURRENT_PROJECT_DIRECTORY=$(_per-project-history-find-up)
   if [[ ${CURRENT_PROJECT_DIRECTORY} = "/" ]]; then
     CURRENT_PROJECT_DIRECTORY="/no_active_project"
